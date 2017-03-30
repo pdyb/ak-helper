@@ -7,8 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "xmkworkbranch" : "bin/mkworkbranch.js"
+    "xmkworkbranch": "bin/mkworkbranch.js"
   },
   "author": "xiaoxinpeng",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "shelljs": "^0.7.7"
+  }
 }
