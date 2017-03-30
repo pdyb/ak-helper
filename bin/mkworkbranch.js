@@ -33,4 +33,5 @@ const git = require("./git.js");
 //     return branchName;
 // }
 
-console.log(git().currentBranchName());
+console.log("branch is: " + git().currentBranchName());
+console.log("isDirty: " +git().isDirty());

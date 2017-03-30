@@ -26,6 +26,18 @@ module.exports = () => {
                 });
 
             return branchName;
+        },
+
+        /**
+         * 是否有修改记录。 true表示有
+         */
+        isDirty: ()=> {
+            var result = spawnSync('git', ['diff', '--shortstat'], {
+                encoding: 'utf8'
+            });
+              
+
+            return result.stdout.toString().trim().length > 0;
         }
     }
 }
