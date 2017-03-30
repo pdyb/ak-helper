@@ -1,18 +1,31 @@
 #!/usr/bin/env node
-
+var colors = require('colors');
 const spawnSync = require('child_process').spawnSync;
+
+function abortWhenErr(cmdResult, msg) {
+    var err = cmdResult.stderr;
+    if (err) {
+        console.log(colors.red(msg));
+
+        throw err;
+    }
+}
 
 module.exports = () => {
     return {
+        checkGitExist: ()=> {
+
+        },
+
         /**
          * 获取当前分支名
          */
-        currentBranchName: ()=> {
+        currentBranchName: () => {
             var result = spawnSync('git', ['branch'], {
                 encoding: 'utf8'
             });
 
-            var branch = "";
+            var branchName = "";
 
             result.stdout
                 .toString()
@@ -31,31 +44,33 @@ module.exports = () => {
         /**
          * 是否有修改记录。 true表示有
          */
-        isDirty: ()=> {
+        isDirty: () => {
             var result = spawnSync('git', ['diff', '--shortstat'], {
                 encoding: 'utf8'
             });
-              
+
 
             return result.stdout.toString().trim().length > 0;
         },
 
-        checkoutBranch: (branchName)=> {
-            spawnSync('git', ['checkout', '-b', branchName]);
-        }, 
+        checkoutBranch: (branchName, errMsg) => {
+            abortWhenErr(spawnSync('git', ['checkout', '-b', branchName]), errMsg);
+        },
 
         /**
          * 暂存
          */
-        stash: (msg)=> {
-            spawnSync('git', ['stash', 'save', msg]);
-        }, 
+        stash: (msg) => {
+            abortWhenErr(spawnSync('git', ['stash', 'save', msg]), "git stash 出错了");
+        },
 
         /**
          * 暂存提取
          */
-        stashApply: ()=> {
-            spawnSync('git', ['stash', 'apply', 'stash@\{0\}']);
-        }, 
+        stashApply: (errMsg) => {
+            abortWhenErr(spawnSync('git', ['stash', 'apply', 'stash@{0}']), errMsg);
+        },
+
+
     }
 }
