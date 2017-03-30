@@ -12,6 +12,7 @@
   "author": "xiaoxinpeng",
   "license": "ISC",
   "dependencies": {
-    "shelljs": "^0.7.7"
+    "shelljs": "^0.7.7",
+    "yargs": "^7.0.2"
   }
 }
