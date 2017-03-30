@@ -38,6 +38,24 @@ module.exports = () => {
               
 
             return result.stdout.toString().trim().length > 0;
-        }
+        },
+
+        checkoutBranch: (branchName)=> {
+            spawnSync('git', ['checkout', '-b', branchName]);
+        }, 
+
+        /**
+         * 暂存
+         */
+        stash: (msg)=> {
+            spawnSync('git', ['stash', 'save', msg]);
+        }, 
+
+        /**
+         * 暂存提取
+         */
+        stashApply: ()=> {
+            spawnSync('git', ['stash', 'apply', 'stash@\{0\}']);
+        }, 
     }
 }
