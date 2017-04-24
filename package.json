@@ -7,12 +7,24 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "xmkworkbranch": "bin/mkworkbranch.js"
+    "xmkworkbranch": "bin/mkworkbranch.js",
+    "xalpha": "bin/xalpha.js",
+    "xreinstall": "bin/xreinstall.js",
+    "xbuild": "bin/xbuild.js",
+    "xtime": "bin/xtime.js",
+    "xakd": "bin/akd.js",
+    "xakl": "bin/akl.js",
+    "xaks": "bin/aks.js",
+    "xaki": "bin/aki.js"
   },
   "author": "xiaoxinpeng",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "colors": "^1.1.2",
+    "readline": "^1.3.0",
     "shelljs": "^0.7.7",
+    "simple-git": "^1.70.0",
     "yargs": "^7.0.2"
   }
 }
