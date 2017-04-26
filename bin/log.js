@@ -10,6 +10,10 @@ exports.i = (msg) => {
     console.log(colors.cyan(msg));
 };
 
+exports.d = (msg) => {
+    console.log(colors.blue(msg));
+};
+
 exports.w = (msg) => {
     console.log(colors.yellow(msg));
 };
@@ -17,6 +21,10 @@ exports.w = (msg) => {
 exports.e = (msg) => {
     console.log(colors.red(msg));
 };
+
+exports.dir = (obj) => {
+    console.dir(obj)
+}
 
 exports.ok = (msg) => {
     console.log(colors.green(msg));

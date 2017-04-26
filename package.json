@@ -9,13 +9,13 @@
   "bin": {
     "xmkworkbranch": "bin/mkworkbranch.js",
     "xalpha": "bin/xalpha.js",
-    "xreinstall": "bin/xreinstall.js",
     "xbuild": "bin/xbuild.js",
     "xtime": "bin/xtime.js",
-    "xakd": "bin/akd.js",
-    "xakl": "bin/akl.js",
-    "xaks": "bin/aks.js",
-    "xaki": "bin/aki.js"
+    "reinstall": "bin/xreinstall.js",
+    "akd": "bin/akd.js",
+    "akl": "bin/akl.js",
+    "aks": "bin/aks.js",
+    "aki": "bin/aki.js"
   },
   "author": "xiaoxinpeng",
   "license": "ISC",

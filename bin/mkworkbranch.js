@@ -14,50 +14,51 @@ const git = require('simple-git')(path);
 
 const suffix = ".work"
 
+function checkEnv() {
+  return new Promise((resolve, reject) => {
+    if (!shell.which("git")) {
+      log.e("未找到git，请检查是否已经安装git")
+      process.exit(1);
+    }
+
+    if (!shell.which("ak")) {
+      log.e("未找到ak，请检查是否已经安装ak")
+      process.exit(1);
+    }
+
+    resolve();
+  })
+}
+
 function sync() {
   return new Promise((resolve, reject) => {
-    log.i("开始同步代码")
+    log.i("同步代码到最新...")
 
-    mk()
+    checkEnv()
+      .then(mk)
       .then(goAssosiateBranch)
-      .then(pull)
+      .then(githelper.pull)
       .then(goWorkBranch)
-      .then(pull)
-      .then(git.checkModifyFiles)
-      .then((hasModify) => {
-        // log.i("\n")
-        
-        if (hasModify) {
-          log.e("代码同步结束，发现冲突，请解决后再次执行")
-          reject();
+      .then(githelper.pull)
+      .then(githelper.status)
+      .then((statusSummary) => {
+        if (statusSummary.conflicted.length != 0) {
+          log.e("代码同步结束，发现冲突，请解决后再次执行akd")
+          // reject();
         } else {
-          // log.v("\n");
           log.ok("代码同步结束，没有冲突")
-          resolve();
+          resolve(statusSummary);
         }
       })
   });
 }
 
-function pull(branch) {
-  return new Promise((resolve, reject) => {
-    log.v("同步" + branch +"分支代码到最新..")
-
-    git
-      .outputHandler(function (command, stdout, stderr) {
-        stdout.pipe(process.stdout);
-        stderr.pipe(process.stderr);
-      })
-      .pull(['--rebase'], (err, out) => {
-        resolve();
-      })
-  });
-}
 
 function goAssosiateBranch() {
   return new Promise((resolve, reject) => {
-    githelper.getCurrentBranchName()
-      .then((currentBranch) => {
+    githelper.status()
+      .then((statusSummary) => {
+        var currentBranch = statusSummary.current;
         // log.v("currentBranch.length=" + currentBranch.toString().length + ", suffix.length=" + suffix.length);
 
         var assosiateBranch = currentBranch.substring(0, currentBranch.toString().length - suffix.length);
@@ -78,8 +79,9 @@ function goWorkBranch() {
   return new Promise((resolve, reject) => {
     // log.v("切换到工作分支")
 
-    githelper.getCurrentBranchName()
-      .then((currentBranch) => {
+    githelper.status()
+      .then((statusSummary) => {
+        var currentBranch = statusSummary.current;
         if (currentBranch.endsWith(suffix)) {
           resolve();
         } else {
@@ -95,12 +97,14 @@ function goWorkBranch() {
 
 function mk() {
   return new Promise((resolve, reject) => {
-    githelper.checkRepoClean()
-      .then(
-        (repoClean) => {
+    githelper.status()
+      .then((statusSummary) => {
+
+        var repoClean = statusSummary.files.length == 0;
+
+        if (repoClean) {
           createBranch(resolve);
-        },
-        () => {
+        } else {
           // log.w("reason: " + reason + ", ask stash");
           githelper.askStash("检测到目录有已经修改的文件，如要stash，请输入 y :")
             .then(
@@ -111,13 +115,14 @@ function mk() {
                 log.e("abort by user")
               })
         }
-      );
-  });
+      })
+  })
 }
 
 function createBranch(resolve) {
-  githelper.getCurrentBranchName()
-    .then((currentBranch) => {
+  githelper.status()
+    .then((statusSummary) => {
+      var currentBranch = statusSummary.current;
       if (currentBranch.endsWith(suffix)) {
         resolve();
       } else {
@@ -127,11 +132,6 @@ function createBranch(resolve) {
       }
     });
 }
-
-
-
-
-mk();
 
 module.exports = {
   goAssosiateBranch: goAssosiateBranch,

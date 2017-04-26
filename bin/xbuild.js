@@ -1,10 +1,12 @@
 #!/usr/bin/env node
+const log = require("./log.js");
 
 var argv = require('yargs')
     .alias('c', 'clean')
     .alias('f', "fast")
     .alias('h', 'help')
     .alias('i', 'install')
+    .alias('r', 'release')
     .argv;
 var colors = require('colors');
 const shell = require('shelljs');
@@ -17,17 +19,22 @@ const shell = require('shelljs');
 
 var clean = argv.clean ? " clean " : "";
 var fast = argv.fast ? " -PminiSdkVersion=21 -Dmtl.tBuildConfig.mergeOverride=false -Dmtl.tBuildConfig.postHandleBundles=false " : "";
+var release = argv.release ? "assembleRelease" : "assembleDebug";
 
-var build_cmd = `./gradlew ${clean} assembleDebug  ${fast}`;
+var build_cmd = `./gradlew ${clean} ${release}  ${fast}`;
 
-console.log(colors.yellow(build_cmd));
+if (fast) {
+    log.w("WARNING: fast build开启，如果安装到5.0以下手机，会出现 包解析出错")
+}
+
+log.i(build_cmd);
 
 var build = shell.exec(build_cmd);
 if (build.code == 0) {
-    console.log(colors.green("\nbuild success at " + ` ${new Date().toLocaleTimeString()} `.black.bgGreen) + "\n\n");
+    log.ok("\nbuild success at " + ` ${new Date().toLocaleTimeString()} `.black.bgGreen + "\n\n");
     if (argv.i) {
         shell.exec("xreinstall . -f");
     }
 } else {
-    console.log(colors.red("\nbuild failed: " + build_cmd));
+    log.e("\nbuild failed: " + build_cmd);
 }

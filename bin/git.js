@@ -8,75 +8,52 @@ const path = process.cwd();
 const git = require('simple-git')(path);
 const log = require("./log.js");
 
-var getCurrentBranchName = () => {
+var gitStatus = () => {
     return new Promise((resolve, reject) => {
-        git.branchLocal((err, result) => {
-            var branchName = result.current;
-            // log.i("branchLocal = " + branchName)
-            resolve(branchName);
-        })
-    });
-}
 
-var abortWhenGitNotExist = () => {
-    return new Promise((resolve, reject) => {
-        if (!shell.which("git")) {
-            log.e("未找到git，请检查是否已经安装git")
-            process.exit(1);
-        }
-
-        if (!shell.which("ak")) {
-            log.e("未找到ak，请检查是否已经安装ak")
-            process.exit(1);
-        }
-
-        git.status((err) => {
-            if (err) {
-                log.e("error:当前目录不是git仓库，请检查工作目录")
-                process.exit(1);
-            }
-            resolve(true);
-        })
-    });
-}
-
-/**
- * 判断当前repo是否有修改文件。
- */
-var checkModifyFiles = () => {
-    return new Promise((resolve, reject) => {
-        git.diff(['--numstat'], (err, result) => {
-            var isDirty = result.toString().trim().length > 0;
-
-            if (isDirty) {
-                log.e("\n" + result)
-            }
-
-            // log.i("checkRepoDirty " + result + ",  isDirty=" + isDirty);
-            resolve(result.toString().trim().length > 0);
-        })
-    });
-}
-
-/**
- * 检测repo是clean的
- */
-var checkRepoClean = () => {
-    return new Promise((resolve, reject) => {
-        abortWhenGitNotExist()
-            .then(checkModifyFiles)
-            .then(
-                (hasModify) => {
-                    // log.i("checkEnv dirty = " + isDirty)
-                    if (hasModify) {
-                        reject("当前目录有未提交的文件");
-                    }
-
-                    resolve("ok");
+        // log.i("git.status begin ======")
+        git
+            .outputHandler(function (command, stdout, stderr) {
+                stdout = null;
+                stderr = null;
+            })
+            .status((err, statusSummary) => {
+                // log.i("=====git.status end")
+                if (err) {
+                    reject("error when get local branch name");
+                    log.e("error:当前目录不是git仓库，请检查工作目录")
+                    process.exit(1);
+                    return;
                 }
-            );
+
+                statusSummary.isDirty = () => {
+                    return this.files.length != 0;
+                };
+
+                // log.dir(statusSummary)
+                resolve(statusSummary);
+            })
     });
 }
+
+var pull = (branch) => {
+    return new Promise((resolve, reject) => {
+        log.v("同步" + branch + "分支代码到最新..")
+
+        git
+            .outputHandler(function (command, stdout, stderr) {
+                stdout.pipe(process.stdout);
+                stderr.pipe(process.stderr);
+            })
+            .pull({
+                '--rebase': 'true'
+            }, (err, update) => {
+                resolve();
+            })
+    });
+}
+
+
 
 /**
  * 引导stash
@@ -103,9 +80,7 @@ var askStash = (tip) => {
 }
 
 module.exports = {
-    checkRepoClean: checkRepoClean,
-    getCurrentBranchName: getCurrentBranchName,
-    abortWhenGitNotExist: abortWhenGitNotExist,
-    checkModifyFiles: checkModifyFiles,
-    askStash: askStash
+    status: gitStatus,
+    askStash: askStash,
+    pull: pull
 }

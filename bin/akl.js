@@ -16,9 +16,12 @@ mk.sync()
             stdio: [process.stdin, process.stdout, process.stderr]
         });
 
-        ak.on('exit', function () {
-            log.i("ak land 成功，重新创建工作分支\n")
-
-            ak.mk();
+        ak.on('exit', function (code) {
+            if (code == 0) {
+                log.ok("ak land 成功，重新创建工作分支\n")
+                mk.mk();
+            } else {
+                log.e("Unexpect!!!")
+            }
         });
     })

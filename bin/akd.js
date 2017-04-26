@@ -5,23 +5,25 @@ const path = process.cwd();
 const git = require('simple-git')(path);
 const shell = require("shelljs")
 const spawn = require('child_process').spawn;
+const spawnSync = require('child_process').spawnSync;
 const exec = require('child_process').exec;
 const log = require("./log.js");
 
 mk.sync()
-    .then(() => {
+    .then((statusSummary) => {
         log.v("\n开始ak diff...")
 
-        var ak = spawn('ak', ['diff', '--reviewers', '工口'], {
+        var ak = spawn('ak', ['diff', '--reviewers', '瓦雷'], {
             stdio: [process.stdin, process.stdout, process.stderr]
         });
 
-        var data1;
-        ak.on('data', (data) => {
-            data1 = data;
-        });
+        ak.on('exit', function (code) {
+            // log.d(data1)
 
-        ak.on('exit', function () {
-            log.i("exit ak" + data1)
+            if (code == 0) {
+                log.ok("ak diff 成功");
+            } else {
+                log.e("Unexpect!!!")
+            }
         });
     })
