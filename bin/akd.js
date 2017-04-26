@@ -8,6 +8,7 @@ const spawn = require('child_process').spawn;
 const spawnSync = require('child_process').spawnSync;
 const exec = require('child_process').exec;
 const log = require("./log.js");
+const githelp = require("./git.js")
 
 mk.sync()
     .then((statusSummary) => {
@@ -22,6 +23,11 @@ mk.sync()
 
             if (code == 0) {
                 log.ok("ak diff 成功");
+
+                githelp.headCommitMsg()
+                    .then((msg) => {
+                        log.i(msg);
+                    })
             } else {
                 log.e("Unexpect!!!")
             }

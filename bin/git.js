@@ -79,8 +79,23 @@ var askStash = (tip) => {
     });
 }
 
+/**
+ * 引导stash
+ * @param {*} tip 引导
+ */
+var headCommitMsg = () => {
+    return new Promise((resolve, reject) => {
+        git
+            .show((err, aa) => {
+                var bb = aa.split('\n');
+                resolve(bb[4]);
+            });
+    })
+}
+
 module.exports = {
     status: gitStatus,
     askStash: askStash,
-    pull: pull
+    pull: pull,
+    headCommitMsg: headCommitMsg
 }
