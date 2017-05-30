@@ -125,7 +125,7 @@ function installApk(file) {
     var installCmd = `adb shell pm install -r /data/local/tmp/${packagename}`;
     var firstInstall = shell.exec(installCmd);
 
-    var failed = firstInstall.stdout.split('\n')[1].indexOf("Success") != 0;
+    var failed = firstInstall === undefined || firstInstall.stdout.split('\n')[1] == undefined || firstInstall.stdout.split('\n')[1].indexOf("Success") != 0;
 
     if (failed) {
         loge("install failed。 try uninstall old apk first ...")

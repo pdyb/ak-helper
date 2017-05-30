@@ -105,6 +105,7 @@ function mk() {
         if (repoClean) {
           createBranch(resolve);
         } else {
+          // console.dir(statusSummary);
           // log.w("reason: " + reason + ", ask stash");
           githelper.askStash("检测到目录有已经修改的文件，如要stash，请输入 y :")
             .then(

@@ -2,19 +2,21 @@
 
 const mk = require("./mkworkbranch.js")
 const path = process.cwd();
-const git = require('simple-git')(path);
 const shell = require("shelljs")
 const spawn = require('child_process').spawn;
-const spawnSync = require('child_process').spawnSync;
-const exec = require('child_process').exec;
 const log = require("./log.js");
 const githelp = require("./git.js")
+const argv = require('yargs')
+    .alias('n', 'nolint')
+    .argv;
 
 mk.sync()
     .then((statusSummary) => {
         log.v("\n开始ak diff...")
 
-        var ak = spawn('ak', ['diff', '--reviewers', '瓦雷'], {
+        // var nolint = argv.nolint ? "--nolint" : "";
+
+        var ak = spawn('ak', argv.nolint ? ['diff', '--nolint' , '--reviewers', '瓦雷'] : ['diff', '--reviewers', '瓦雷'], {
             stdio: [process.stdin, process.stdout, process.stderr]
         });
 
@@ -22,11 +24,11 @@ mk.sync()
             // log.d(data1)
 
             if (code == 0) {
-                log.ok("ak diff 成功");
+                // log.ok("ak diff 成功");
 
                 githelp.headCommitMsg()
                     .then((msg) => {
-                        log.i(msg);
+                        log.i(`\n${msg}\n`);
                     })
             } else {
                 log.e("Unexpect!!!")
