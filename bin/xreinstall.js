@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+const log = require("./log.js");
 const fs = require('fs');
 const colors = require('colors');
 const shell = require('shelljs');
@@ -15,22 +15,6 @@ const argv = require('yargs')
 
 var DIR = argv._.length == 0 ? "/Users/xiaoxinpeng/Downloads/" : argv._[0];
 
-var logi = (msg) => {
-    console.log(colors.cyan(msg));
-};
-
-var logw = (msg) => {
-    console.log(colors.yellow(msg));
-};
-
-var loge = (msg) => {
-    console.log(colors.red(msg));
-};
-
-var logok = (msg) => {
-    console.log(colors.green(msg));
-};
-
 function question(tip, action) {
     const rl = readline
         .createInterface({
@@ -45,19 +29,19 @@ function question(tip, action) {
 
 function checkDeviceConnect() {
     if (execSilent("which adb").code != 0) {
-        loge("can not found adb, please check");
+        log.e("can not found adb, please check");
         process.exit(1);
     }
 
-    logi("wait adb device...")
+    log.i("wait adb device...")
     shell.exec("adb wait-for-device");
-    logi("divice connected")
+    log.i("divice connected")
 
     // console.log(shell.exec("which adb").code == 0);
 }
 
 function listApkIn(dir) {
-    logi(`search dir:${DIR} \n`)
+    log.i(`search dir:${DIR} \n`)
     var apks = [];
     shell.find(dir)
         .filter((file) => {
@@ -71,7 +55,7 @@ function listApkIn(dir) {
         });
 
     if (apks.length <= 0) {
-        loge("no apk found in " + dir)
+        log.e("no apk found in " + dir)
         shell.exit(0)
         return;
     }
@@ -93,11 +77,11 @@ function chooseOneApk(dir, action) {
 
     var apklist = listApkIn(dir);
 
-    logi(`found this:\n------------------------------------------`);
+    log.i(`found this:\n------------------------------------------`);
     apklist.forEach((item, i) => {
-        logi("| " + i + " |  " + item)
+        log.i("| " + i + " |  " + item)
     });
-    logi("------------------------------------------\n");
+    log.i("------------------------------------------\n");
 
     if (argv.f) {
         action(apklist[0]);
@@ -115,29 +99,29 @@ function chooseOneApk(dir, action) {
  */
 function installApk(file) {
     var packagename = getPackageName(file);
-    logi(`sending ${file} ... `);
+    log.i(`sending ${file} ... `);
 
     execSilent(`adb push "${file}" /data/local/tmp/"${packagename}"`);
     execSilent(`adb shell am force-stop "${packagename}"`);
 
-    logi("install apk...");
+    log.i("install apk...");
 
     var installCmd = `adb shell pm install -r /data/local/tmp/${packagename}`;
-    var firstInstall = shell.exec(installCmd);
+    var firstInstall = shell.exec(installCmd)
 
     var failed = firstInstall === undefined || firstInstall.stdout.split('\n')[1] == undefined || firstInstall.stdout.split('\n')[1].indexOf("Success") != 0;
 
     if (failed) {
-        loge("install failed。 try uninstall old apk first ...")
+        log.e("install failed。 try uninstall old apk first ...")
 
         var uninsallOldCmd = `adb shell pm uninstall ${packagename}`
 
-        logi("install apk...");
+        log.i("install apk...");
 
         shell.exec(uninsallOldCmd)
         shell.exec(installCmd);
     } else {
-        logok("\nsuccess");
+        log.ok("\nsuccess");
     }
 
     autoLaunchApp(packagename)

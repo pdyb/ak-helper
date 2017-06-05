@@ -16,6 +16,9 @@ const shell = require('shelljs');
 // console.log(argv.fast)
 // console.log(argv.install)
 
+log.v("手机的系统版本:")
+shell.exec("adb shell getprop ro.build.version.release")
+log.v("")
 
 var clean = argv.clean ? " clean " : "";
 var fast = argv.fast ? " -PminiSdkVersion=21 -Dmtl.tBuildConfig.mergeOverride=false -Dmtl.tBuildConfig.postHandleBundles=false " : "";
