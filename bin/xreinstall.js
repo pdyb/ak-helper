@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const log = require("./log.js");
 const fs = require('fs');
 const colors = require('colors');
@@ -33,15 +34,15 @@ function checkDeviceConnect() {
         process.exit(1);
     }
 
-    log.i("wait adb device...")
+    log.v("wait adb device...")
     shell.exec("adb wait-for-device");
-    log.i("divice connected")
+    log.v("divice connected")
 
     // console.log(shell.exec("which adb").code == 0);
 }
 
 function listApkIn(dir) {
-    log.i(`search dir:${DIR} \n`)
+    log.v(`search dir:${DIR} \n`)
     var apks = [];
     shell.find(dir)
         .filter((file) => {
@@ -77,11 +78,11 @@ function chooseOneApk(dir, action) {
 
     var apklist = listApkIn(dir);
 
-    log.i(`found this:\n------------------------------------------`);
+    log.v(`found this:\n------------------------------------------`);
     apklist.forEach((item, i) => {
-        log.i("| " + i + " |  " + item)
+        log.v("| " + i + " |  " + item)
     });
-    log.i("------------------------------------------\n");
+    log.v("------------------------------------------\n");
 
     if (argv.f) {
         action(apklist[0]);
@@ -99,32 +100,27 @@ function chooseOneApk(dir, action) {
  */
 function installApk(file) {
     var packagename = getPackageName(file);
-    log.i(`sending ${file} ... `);
+    log.v(`sending ${file} ... `);
 
     execSilent(`adb push "${file}" /data/local/tmp/"${packagename}"`);
     execSilent(`adb shell am force-stop "${packagename}"`);
 
-    log.i("install apk...");
+    log.v("install apk...");
 
     var installCmd = `adb shell pm install -r /data/local/tmp/${packagename}`;
-    var firstInstall = shell.exec(installCmd)
+    shell.exec(installCmd, (err, stdout, stderr) => {
+        if (err) {
+            log.e("install failed。 try uninstall old apk first ...")
+            var uninsallOldCmd = `adb shell pm uninstall ${packagename}`
+            log.v("install apk...");
+            shell.exec(uninsallOldCmd)
+            shell.exec(installCmd);
+        } else {
+            log.ok("\nsuccess");
+        }
 
-    var failed = firstInstall === undefined || firstInstall.stdout.split('\n')[1] == undefined || firstInstall.stdout.split('\n')[1].indexOf("Success") != 0;
-
-    if (failed) {
-        log.e("install failed。 try uninstall old apk first ...")
-
-        var uninsallOldCmd = `adb shell pm uninstall ${packagename}`
-
-        log.i("install apk...");
-
-        shell.exec(uninsallOldCmd)
-        shell.exec(installCmd);
-    } else {
-        log.ok("\nsuccess");
-    }
-
-    autoLaunchApp(packagename)
+        autoLaunchApp(packagename)
+    });
 }
 
 
