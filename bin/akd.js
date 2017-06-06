@@ -12,7 +12,16 @@ const argv = require('yargs')
 const term = require('terminal-kit').terminal;
 
 
-var people = ['瓦雷', '娄震', '优敏', '工口', '兮乐', '沂风', '豪雄', '苍鸾', '晨暖']
+var people = ['瓦雷', '重娄', '优敏', '工口', '兮乐', '沂风', '豪雄', '苍鸾', '晨暖']
+var peoplephone = [{
+    '瓦雷': '13916459723'
+}, {
+    '工口': '17195877744'
+}, {
+    '重娄': '18757556715'
+}]
+
+var atPhone = '17195877744'
 
 function akdiff() {
     return new Promise((resolve, reject) => {
@@ -55,14 +64,15 @@ function selectReviewer(resolve, reject) {
             return;
         }
         // log.dir(response)
+        atPhone = peoplephone[response.selectedText]
         resolve(response.selectedText)
         process.exit();
     })
-
-    term.on('message', (result) => {
-        log.ok("ppp-> " + result)
-    });
 }
+
+// function askPost2DingDing(msg) {
+//     return new Promise((resolve, reject) => {})
+// }
 
 function post2DingDing(msg) {
     var https = require('https');
@@ -73,6 +83,12 @@ function post2DingDing(msg) {
         "msgtype": "text",
         "text": {
             "content": msg
+        },
+        "at": {
+            "atMobiles": [
+                atPhone
+            ],
+            "isAtAll": false
         }
     })
 
@@ -93,7 +109,7 @@ function post2DingDing(msg) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             // console.log('BODY: ' + chunk);
-            console.ok('发送到钉钉ok')
+            log.ok('发送到钉钉ok')
         });
     });
 
@@ -106,10 +122,9 @@ function post2DingDing(msg) {
     req.end();
 }
 
+// post2DingDing('21231');
+
 mk.sync()
     .then(akdiff)
-    .then(post2DingDing)
+    // .then(post2DingDing)
 
-// selectReviewer((name) => {
-//     log.ok('name->' + name)
-// })
