@@ -28,10 +28,17 @@ function akdiff() {
             githelp.headCommitMsg()
                 .then((gitMsgLines) => {
                     var info = gitMsgLines[4];
-                    var revision = gitMsgLines[gitMsgLines.length - 3];
-                    log.v(`\n${info}\n ${revision}`);
+                    var revision = '';
+                    for (line in gitMsgLines) {
+                        if (gitMsgLines[line].includes('Revision')) {
+                            revision = gitMsgLines[line];
+                            break;
+                        }
+                    }
 
-                    resolve(`${info}\n ${revision}`)
+                    log.v(`\n${info}\n${revision}`);
+
+                    resolve(`${info}\n${revision}`)
                 })
         });
     })
