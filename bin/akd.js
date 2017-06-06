@@ -9,6 +9,10 @@ const githelp = require("./git.js")
 const argv = require('yargs')
     .alias('n', 'nolint')
     .argv;
+const term = require('terminal-kit').terminal;
+
+
+var people = ['瓦雷', '娄震', '优敏', '工口', '兮乐', '沂风', '豪雄', '苍鸾', '晨暖']
 
 function akdiff() {
     return new Promise((resolve, reject) => {
@@ -44,5 +48,25 @@ function akdiff() {
     })
 }
 
+function selectReviewer(resolve, reject) {
+    term.singleColumnMenu(people, [], (error, response) => {
+        if (error != undefined) {
+            reject(error);
+            return;
+        }
+        // log.dir(response)
+        resolve(response.selectedText)
+        process.exit();
+    })
+
+    term.on('message', (result) => {
+        log.ok("ppp-> " + result)
+    });
+}
+
 mk.sync()
     .then(akdiff)
+
+// selectReviewer((name) => {
+//     log.ok('name->' + name)
+// })
