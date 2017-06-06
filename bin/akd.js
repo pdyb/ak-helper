@@ -64,8 +64,51 @@ function selectReviewer(resolve, reject) {
     });
 }
 
+function post2DingDing(msg) {
+    var https = require('https');
+    var url = require('url');
+    var querystring = require('querystring');
+
+    var postData = JSON.stringify({
+        "msgtype": "text",
+        "text": {
+            "content": msg
+        }
+    })
+
+    var options = {
+        hostname: 'oapi.dingtalk.com',
+        port: 443,
+        path: '/robot/send?access_token=6737639fcc6431c0de0d7e6f35fe342526983bb31eb675e53a2d28e68c943254',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': postData.length
+        }
+    };
+
+    var req = https.request(options, function (res) {
+        console.log('STATUS: ' + res.statusCode);
+        console.log('HEADERS: ' + JSON.stringify(res.headers));
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            // console.log('BODY: ' + chunk);
+            console.ok('发送到钉钉ok')
+        });
+    });
+
+    req.on('error', function (e) {
+        console.log('problem with request: ' + e.message);
+    });
+
+    // write data to request body
+    req.write(postData);
+    req.end();
+}
+
 mk.sync()
     .then(akdiff)
+    .then(post2DingDing)
 
 // selectReviewer((name) => {
 //     log.ok('name->' + name)
