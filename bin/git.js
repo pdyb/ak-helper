@@ -88,7 +88,7 @@ var headCommitMsg = () => {
         git
             .show((err, aa) => {
                 var bb = aa.split('\n');
-                resolve(bb[4]);
+                resolve(bb);
             });
     })
 }
