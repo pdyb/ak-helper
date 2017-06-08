@@ -34,7 +34,7 @@ function akdiff() {
         ak.on('exit', function (code) {
             if (code != 0) {
                 log.e("Unexpect!!!")
-                reject();
+                // reject();
                 return;
             }
 
@@ -42,16 +42,16 @@ function akdiff() {
                 .then((gitMsgLines) => {
                     var info = gitMsgLines[4];
                     var revision = '';
-                    for (line in gitMsgLines) {
-                        if (gitMsgLines[line].includes('Revision')) {
-                            revision = gitMsgLines[line];
+                    for (line of gitMsgLines) {
+                        if (line.includes('Revision')) {
+                            revision = line;
                             break;
                         }
                     }
 
-                    log.v(`\n\n${info}\n${revision}\n`);
+                    log.v(`\n\n${info.trim()}\n${revision.trim()}\n`);
 
-                    resolve(`${info}\n${revision}`)
+                    resolve(`${info.trim()}\n${revision.trim()}`)
                 })
         });
     })
@@ -65,7 +65,9 @@ function selectReviewer(resolve, reject) {
         }
         // log.dir(response)
         atPhone = peoplephone[response.selectedText]
-        resolve(response.selectedText)
+        response.on('data', () => {
+            resolve(response.selectedText)
+        })
         process.exit();
     })
 }
@@ -74,7 +76,7 @@ function selectReviewer(resolve, reject) {
 //     return new Promise((resolve, reject) => {})
 // }
 
-function post2DingDing(msg) {
+function postMsg2DingDing(msg) {
     var https = require('https');
     var url = require('url');
     var querystring = require('querystring');
@@ -126,5 +128,4 @@ function post2DingDing(msg) {
 
 mk.sync()
     .then(akdiff)
-    // .then(post2DingDing)
-
+// .then(post2DingDing)
