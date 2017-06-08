@@ -20,7 +20,6 @@
   "author": "xiaoxinpeng",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.0",
     "colors": "^1.1.2",
     "readline": "^1.3.0",
     "shelljs": "^0.7.7",

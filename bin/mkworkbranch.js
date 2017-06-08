@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Promise = require("bluebird");
 const log = require("./log.js");
 const githelper = require("./git.js");
 const shell = require("shelljs")

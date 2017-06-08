@@ -49,7 +49,7 @@ function akdiff() {
                         }
                     }
 
-                    log.v(`\n${info}\n${revision}`);
+                    log.v(`\n\n${info}\n${revision}\n`);
 
                     resolve(`${info}\n${revision}`)
                 })

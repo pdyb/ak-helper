@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const Promise = require("bluebird");
 const colors = require('colors');
 const shell = require('shelljs');
 const spawnSync = require('child_process').spawnSync;
