@@ -57,20 +57,29 @@ function akdiff() {
     })
 }
 
-function selectReviewer(resolve, reject) {
-    term.singleColumnMenu(people, [], (error, response) => {
-        if (error != undefined) {
-            reject(error);
-            return;
-        }
-        // log.dir(response)
-        atPhone = peoplephone[response.selectedText]
-        response.on('data', () => {
-            resolve(response.selectedText)
+function selectReviewer() {
+    return new Promise((resolve, reject) => {
+        term.singleColumnMenu(people, [], (error, response) => {
+            if (error != undefined) {
+                reject(error);
+                return;
+            }
+            // log.dir(response)
+            atPhone = peoplephone[response.selectedText]
+            resolve(response)
+            process.exit();
         })
-        process.exit();
     })
+
 }
+
+
+// selectReviewer()
+//     .then((name) => {
+//         log.ok('name' + name)
+//     }, (err) => {
+//         log.e('err' + err)
+//     })
 
 // function askPost2DingDing(msg) {
 //     return new Promise((resolve, reject) => {})
@@ -124,8 +133,11 @@ function postMsg2DingDing(msg) {
     req.end();
 }
 
-// post2DingDing('21231');
 
 mk.sync()
     .then(akdiff)
+    .then((diff) => {
+        shell.exec(`echo '${diff}' | pbcopy`)
+        log.ok("diff链接已经复制到剪切板")
+    })
 // .then(post2DingDing)
