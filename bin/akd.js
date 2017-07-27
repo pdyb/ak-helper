@@ -73,17 +73,12 @@ function selectReviewer() {
 
 }
 
-
 // selectReviewer()
 //     .then((name) => {
 //         log.ok('name' + name)
 //     }, (err) => {
 //         log.e('err' + err)
 //     })
-
-// function askPost2DingDing(msg) {
-//     return new Promise((resolve, reject) => {})
-// }
 
 function postMsg2DingDing(msg) {
     var https = require('https');
@@ -119,7 +114,6 @@ function postMsg2DingDing(msg) {
         console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            // console.log('BODY: ' + chunk);
             log.ok('发送到钉钉ok')
         });
     });
@@ -139,5 +133,6 @@ mk.sync()
     .then((diff) => {
         shell.exec(`echo '${diff}' | pbcopy`)
         log.ok("diff链接已经复制到剪切板")
+        return Promise.resolve(diff);
     })
-// .then(post2DingDing)
+    .then(postMsg2DingDing)
