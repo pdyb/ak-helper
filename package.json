@@ -1,6 +1,6 @@
 {
-  "name": "@onlyxxp/ak-helper",
-  "version": "1.0.0",
+  "name": "@onlyxxp/dev-kit",
+  "version": "0.1.0",
   "description": "ak helper tool",
   "main": "index.js",
   "scripts": {

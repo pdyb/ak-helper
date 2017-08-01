@@ -49,7 +49,8 @@ function listApkIn(dir) {
             return String(file).endsWith(".apk");
         })
         .sort((a, b) => {
-            return fs.lstatSync(a).mtime - fs.lstatSync(b).mtime < 0;
+            // log.i(a + fs.lstatSync(a).atime.getTime() + "  " + b + fs.lstatSync(b).atime.getTime())
+            return fs.lstatSync(a).mtime.getTime() - fs.lstatSync(b).mtime.getTime() < 0;
         })
         .forEach((file, i) => {
             apks[i] = file;
